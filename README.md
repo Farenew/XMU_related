@@ -11,6 +11,6 @@ Something related with XMU
 
 ### Lab1:
 
-实验报告: [report1](https://github.com/ForenewHan/XMU_related/blob/master/nachOS/Lab1/report1.pdf)
-Doubly-linked-list实现代码: [doubly-linked-list](https://github.com/ForenewHan/XMU_related/tree/master/nachOS/Lab1/code/doubly-linked-list)
-源nachOS项目修改代码:[modified-code](https://github.com/ForenewHan/XMU_related/tree/master/nachOS/Lab1/code/modified-code)
+- 实验报告: [report1](https://github.com/ForenewHan/XMU_related/blob/master/nachOS/Lab1/report1.pdf)
+- Doubly-linked-list实现代码: [doubly-linked-list](https://github.com/ForenewHan/XMU_related/tree/master/nachOS/Lab1/code/doubly-linked-list)
+- 源nachOS项目修改代码:[modified-code](https://github.com/ForenewHan/XMU_related/tree/master/nachOS/Lab1/code/modified-code)
