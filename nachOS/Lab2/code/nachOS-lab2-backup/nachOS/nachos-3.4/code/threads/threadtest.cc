@@ -12,6 +12,8 @@
 #include "copyright.h"
 #include "system.h"
 #include "dllist.h"
+#include "synchlist.h"
+#include "utility.h"
 
 // testnum is set in main.cc
 int testnum = 2;
@@ -45,9 +47,11 @@ SimpleThread(int which)
 void threadDelTest(int t){
     int key;
 
-    for(int i=0;i<N/2;i++){
-        dl.Remove(&key);
-        printf("thread %d remove at %d\n", t, key);
+    for(int i=0;i<N;i++){
+        if(dl.Remove(&key)!=NULL)
+            printf("thread %d remove at %d\n", t, key);
+        else
+            printf("list is empty now\n");
         currentThread->Yield();
     }
 }
@@ -77,7 +81,7 @@ ThreadTest2()
     DEBUG('t', "Entering ThreadTest2");
 
     Thread *t = new Thread("forked thread");
-
+    Thread *t2 = new Thread("forked thread");
     printf("getItems");
     // generate N random keys for dl
     genItems(&dl, N);
@@ -85,8 +89,19 @@ ThreadTest2()
     printf("\n---------------------------\n");
     // fork a new thread to do threadDelTest, allocate thread number as 0
     t->Fork(threadDelTest, 0);
+    t2->Fork(threadDelTest, 2);
     // do threadDelTest, allocate thread number as 1
     threadDelTest(1);
+}
+
+
+// threadtest3, used to test doubly linkd list, structure declared in dllist.h
+void
+ThreadTest3()
+{
+    DEBUG('t', "Entering ThreadTest3");
+    SynchList sl;
+
 }
 
 //----------------------------------------------------------------------
@@ -103,6 +118,9 @@ ThreadTest()
 	break;
     case 2:
     ThreadTest2();
+    break;
+    case 3:
+    ThreadTest3();
     break;
     default:
 	printf("No test specified.\n");

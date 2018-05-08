@@ -22,7 +22,7 @@ void genItems(DLList *dl, const int N){
         std::cout << key[i] << std::endl;
     }
 
-    int *item = NULL;
+    int *item = key;
     for(int i=0;i<N;i++){
         dl->SortedInsert((void*)item, key[i]);
     }

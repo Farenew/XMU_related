@@ -103,35 +103,73 @@ Semaphore::V()
 Lock::Lock(char* debugName) {
     name = debugName;
     value = Free;
-    queue = new List;
+    waitQueue = new List;
+    thread = NULL;
 }
 Lock::~Lock() {
-    delete queue;
+    delete waitQueue;
 }
 void Lock::Acquire() {
+    ASSERT(!isHeldByCurrentThread());       // if thread don't have lock, then it's fine.
+                                            // if thread has lock, then it cannot acquire again
     IntStatus oldLevel = interrupt->SetLevel(IntOff);   // disable interrupts
     if(value == Busy){
-        queue->Append((void *)currentThread);   // so go to sleep
+        waitQueue->Append((void *)currentThread);   // append to waiting list and go sleep
         currentThread->Sleep();
     }
     else{
         value = Busy;
+        thread = currentThread;             // thread tells who owns lock now
     }
     (void) interrupt->SetLevel(oldLevel);   // re-enable interrupts
 }
 void Lock::Release() {
+    ASSERT(isHeldByCurrentThread());       // only if thread have lock, then we can release
     IntStatus oldLevel = interrupt->SetLevel(IntOff);   // disable interrupts
-    if(!queue->IsEmpty()){
-        
+    if(!waitQueue->IsEmpty()){
+        Thread* threadtoRun = (Thread*)waitQueue->Remove();
+        scheduler->ReadyToRun(threadtoRun);
     }
     else{
         value = Free;
+        thread = NULL;
     }
     (void) interrupt->SetLevel(oldLevel);   // re-enable interrupts
 }
+bool Lock::isHeldByCurrentThread(){
+    return thread == currentThread;
+}
 
-Condition::Condition(char* debugName) { }
-Condition::~Condition() { }
-void Condition::Wait(Lock* conditionLock) { ASSERT(FALSE); }
-void Condition::Signal(Lock* conditionLock) { }
-void Condition::Broadcast(Lock* conditionLock) { }
+
+Condition::Condition(char* debugName) {
+    name = debugName;
+    waitNum = 0;
+    waitQueue = new List;
+}
+Condition::~Condition() { 
+    delete waitQueue;
+}
+void Condition::Wait(Lock* conditionLock) { 
+    ASSERT(conditionLock->isHeldByCurrentThread());
+    waitNum++;
+    waitQueue->Append((void *)currentThread);   // so go to sleep
+    conditionLock->Release();
+    currentThread->Sleep();
+    conditionLock->Acquire();
+}
+void Condition::Signal(Lock* conditionLock) {
+    ASSERT(conditionLock->isHeldByCurrentThread());
+    if(waitNum > 0){
+        waitNum--;
+        Thread* threadtoRun = (Thread*)waitQueue->Remove();
+        scheduler->ReadyToRun(threadtoRun);
+    }
+}
+void Condition::Broadcast(Lock* conditionLock) { 
+    ASSERT(conditionLock->isHeldByCurrentThread());
+    while(waitNum > 0){
+        waitNum--;
+        Thread* threadtoRun = (Thread*)waitQueue->Remove();
+        scheduler->ReadyToRun(threadtoRun);
+    }
+}

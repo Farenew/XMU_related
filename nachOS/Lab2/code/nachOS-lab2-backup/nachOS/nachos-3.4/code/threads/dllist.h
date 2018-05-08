@@ -5,7 +5,6 @@
 #ifndef NACHOS_DLLIST_H
 #define NACHOS_DLLIST_H
 
-#define NULL 0
 
 class DLLElement{
 public:

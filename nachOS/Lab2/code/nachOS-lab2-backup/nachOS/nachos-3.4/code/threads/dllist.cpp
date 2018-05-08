@@ -3,6 +3,7 @@
 //
 
 #include "dllist.h"
+#include "utility.h"
 
 const int min = 0;
 const int max = 1;

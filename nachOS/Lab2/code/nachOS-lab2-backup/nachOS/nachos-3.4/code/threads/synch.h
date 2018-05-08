@@ -84,7 +84,8 @@ class Lock {
   private:
     char* name;				// for debugging
     int value;
-    List *queue;
+    List *waitQueue;
+    Thread *thread;         // thread indicated the current thread who has lock
     // plus some other stuff you'll need to define
 };
 
@@ -137,6 +138,8 @@ class Condition {
 
   private:
     char* name;
+    int waitNum;
+    List *waitQueue;
     // plus some other stuff you'll need to define
 };
 #endif // SYNCH_H
