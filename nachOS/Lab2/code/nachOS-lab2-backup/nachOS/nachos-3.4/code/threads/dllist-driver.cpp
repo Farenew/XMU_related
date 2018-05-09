@@ -2,10 +2,12 @@
 // Created by jiang on 2018/3/23.
 //
 
-#include "dllist.h"
+
 #include <iostream>
 #include <ctime>
 #include <cstdlib>
+#include "dllist.h"
+
 
 extern DLList dl;
 
@@ -37,4 +39,3 @@ void remove(DLList *dl, const int N){
         std::cout << "delete at " << key << std::endl;
     }
 }
-

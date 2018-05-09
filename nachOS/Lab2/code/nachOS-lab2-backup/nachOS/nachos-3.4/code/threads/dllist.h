@@ -1,10 +1,11 @@
 //
-// Created by jiang on 2018/3/24.
+// Created by ForenewHan on 2018/3/24.
 //
 
-#ifndef NACHOS_DLLIST_H
-#define NACHOS_DLLIST_H
+#ifndef DLLIST_H
+#define DLLIST_H
 
+#include "utility.h"
 
 class DLLElement{
 public:
@@ -29,6 +30,8 @@ public:
 
     void SortedInsert(void *item, int sortKey);
     void *SortedRemove(int sortKey);
+
+    void Mapcar(VoidFunctionPtr func);
 
 private:
     DLLElement *first;

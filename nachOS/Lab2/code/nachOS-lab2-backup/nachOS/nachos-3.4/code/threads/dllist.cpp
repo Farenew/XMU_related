@@ -3,7 +3,6 @@
 //
 
 #include "dllist.h"
-#include "utility.h"
 
 const int min = 0;
 const int max = 1;
@@ -206,3 +205,14 @@ void *DLList::SortedRemove(int sortKey) {
 }
 
 
+// imitating Mapcar in list.cc
+void
+DLList::Mapcar(VoidFunctionPtr func)
+{
+    for (DLLElement *ptr = first; ptr != NULL; ptr = ptr->next) {
+
+       DEBUG('l', "In mapcar, about to invoke %x(%x)\n", func, ptr->item);
+
+       (*func)((int)ptr->item);
+    }
+}

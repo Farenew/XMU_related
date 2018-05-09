@@ -97,7 +97,7 @@ main(int argc, char **argv)
         argCount++;
         break;
       default:
-        testnum = 2;
+        testnum = 3;
         break;
       }
     }

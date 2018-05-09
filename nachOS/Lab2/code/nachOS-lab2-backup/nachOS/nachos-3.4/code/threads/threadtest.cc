@@ -12,15 +12,16 @@
 #include "copyright.h"
 #include "system.h"
 #include "dllist.h"
-#include "synchlist.h"
-#include "utility.h"
+#include "syndllist.h"
 
 // testnum is set in main.cc
-int testnum = 2;
+int testnum = 3;
 
 // dl is doubly linked list, N is items we store in dl
 DLList dl;
 const int N = 10;
+// sl is synchronized doubly linked list, used for threadtest 3
+Syndllist sl;
 
 //----------------------------------------------------------------------
 // SimpleThread
@@ -47,15 +48,40 @@ SimpleThread(int which)
 void threadDelTest(int t){
     int key;
 
-    for(int i=0;i<N;i++){
-        if(dl.Remove(&key)!=NULL)
-            printf("thread %d remove at %d\n", t, key);
-        else
-            printf("list is empty now\n");
+    for(int i=0;i<N/2;i++){
+        dl.Remove(&key);
+        printf("thread %d remove at %d\n", t, key);
         currentThread->Yield();
     }
 }
 
+
+void SynThreadTest(int t){
+    int key[N] = {7,9,6,5,8,4,13,56,2,10};
+/*    srand(time(NULL));
+    for(int i=0;i<N;i++){
+        key[i] = rand()%100;
+    }
+*/
+    // print out the keys inserted
+    for(int i=0;i<N;i++){
+        printf("%d\n",key[i]);
+    }
+
+    int *item = key;
+    for(int i=0;i<N;i++){
+        sl.Append((void*)item, key[i]);
+    }
+}
+
+void SynThreadDel(int t){
+    int keyValue;
+    for(int i=0;i<N/2;i++){
+        sl.Remove(&keyValue);
+        printf("thread %d remove at %d\n", t, keyValue);
+        currentThread->Yield();
+    }
+}
 
 //----------------------------------------------------------------------
 // ThreadTest1
@@ -81,29 +107,34 @@ ThreadTest2()
     DEBUG('t', "Entering ThreadTest2");
 
     Thread *t = new Thread("forked thread");
-    Thread *t2 = new Thread("forked thread");
-    printf("getItems");
+
+    printf("getItems\n");
     // generate N random keys for dl
     genItems(&dl, N);
 
     printf("\n---------------------------\n");
     // fork a new thread to do threadDelTest, allocate thread number as 0
     t->Fork(threadDelTest, 0);
-    t2->Fork(threadDelTest, 2);
     // do threadDelTest, allocate thread number as 1
     threadDelTest(1);
 }
 
-
-// threadtest3, used to test doubly linkd list, structure declared in dllist.h
-void
-ThreadTest3()
-{
+// threadtest3, used to test thread with lock and condition implemented.
+void ThreadTest3(){
     DEBUG('t', "Entering ThreadTest3");
-    SynchList sl;
+
+    Thread *t = new Thread("forked thread");
+    printf("getItems\n");
+
+    printf("\n---------------------------\n");
+
+    SynThreadTest(0);
+    // fork a new thread to do threadDelTest, allocate thread number as 0
+    t->Fork(SynThreadDel, 0);
+    // do threadDelTest, allocate thread number as 1
+    SynThreadDel(1);
 
 }
-
 //----------------------------------------------------------------------
 // ThreadTest
 // 	Invoke a test routine.
@@ -121,7 +152,7 @@ ThreadTest()
     break;
     case 3:
     ThreadTest3();
-    break;
+
     default:
 	printf("No test specified.\n");
 	break;

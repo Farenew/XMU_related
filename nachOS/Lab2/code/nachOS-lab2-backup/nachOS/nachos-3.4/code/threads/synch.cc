@@ -150,7 +150,8 @@ Condition::~Condition() {
     delete waitQueue;
 }
 void Condition::Wait(Lock* conditionLock) { 
-    ASSERT(conditionLock->isHeldByCurrentThread());
+    // only if we have the condition, can we implemtn wait
+    ASSERT(conditionLock->isHeldByCurrentThread());         
     waitNum++;
     waitQueue->Append((void *)currentThread);   // so go to sleep
     conditionLock->Release();
@@ -158,6 +159,7 @@ void Condition::Wait(Lock* conditionLock) {
     conditionLock->Acquire();
 }
 void Condition::Signal(Lock* conditionLock) {
+    // only if we have the condition, can we implemtn signal
     ASSERT(conditionLock->isHeldByCurrentThread());
     if(waitNum > 0){
         waitNum--;
@@ -166,6 +168,7 @@ void Condition::Signal(Lock* conditionLock) {
     }
 }
 void Condition::Broadcast(Lock* conditionLock) { 
+    // only if we have the condition, can we implemtn broadcast
     ASSERT(conditionLock->isHeldByCurrentThread());
     while(waitNum > 0){
         waitNum--;

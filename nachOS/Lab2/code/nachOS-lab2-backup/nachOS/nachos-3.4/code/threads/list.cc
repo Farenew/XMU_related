@@ -34,6 +34,7 @@ ListElement::ListElement(void *itemPtr, int sortKey)
      next = NULL;	// assume we'll put it at the end of the list 
 }
 
+
 //----------------------------------------------------------------------
 // List::List
 //	Initialize a list, empty to start with.
