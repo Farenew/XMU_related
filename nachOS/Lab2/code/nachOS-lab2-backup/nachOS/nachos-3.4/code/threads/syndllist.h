@@ -10,6 +10,7 @@
 
 #include "dllist.h"
 #include "synch.h"
+#include "system.h"
 
 class Syndllist {
   public:
@@ -28,6 +29,7 @@ class Syndllist {
     Lock *lock;			// enforce mutual exclusive access to the dllist
     Condition *listEmpty;	// wait in Remove if the dllist is empty
 };
+
 
 #endif
 

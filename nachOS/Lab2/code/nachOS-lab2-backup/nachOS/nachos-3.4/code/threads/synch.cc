@@ -110,10 +110,12 @@ Lock::~Lock() {
     delete waitQueue;
 }
 void Lock::Acquire() {
-    ASSERT(!isHeldByCurrentThread());       // if thread don't have lock, then it's fine.
-                                            // if thread has lock, then it cannot acquire again
     IntStatus oldLevel = interrupt->SetLevel(IntOff);   // disable interrupts
     if(value == Busy){
+        // using this to indicate lock acquire failed, thread is put into waiting list
+        currentThread->Print();
+        printf("lock acquire failed\n");
+
         waitQueue->Append((void *)currentThread);   // append to waiting list and go sleep
         currentThread->Sleep();
     }
@@ -124,7 +126,6 @@ void Lock::Acquire() {
     (void) interrupt->SetLevel(oldLevel);   // re-enable interrupts
 }
 void Lock::Release() {
-    ASSERT(isHeldByCurrentThread());       // only if thread have lock, then we can release
     IntStatus oldLevel = interrupt->SetLevel(IntOff);   // disable interrupts
     if(!waitQueue->IsEmpty()){
         Thread* threadtoRun = (Thread*)waitQueue->Remove();

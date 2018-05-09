@@ -65,6 +65,11 @@ Syndllist::Remove(int *keyPtr)
     void *item;
 
     lock->Acquire();			// enforce mutual exclusion
+
+    //printf("enter interrupt\n");
+    currentThread->Yield();
+    //printf("interrupt finished\n");
+
     while (dllist->isEmpty())
 	listEmpty->Wait(lock);		// wait until dllist isn't empty
     item = dllist->Remove(keyPtr);

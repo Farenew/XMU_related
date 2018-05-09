@@ -123,7 +123,7 @@ ThreadTest2()
 void ThreadTest3(){
     DEBUG('t', "Entering ThreadTest3");
 
-    Thread *t = new Thread("forked thread");
+    Thread *t = new Thread("thread 2");
     printf("getItems\n");
 
     printf("\n---------------------------\n");

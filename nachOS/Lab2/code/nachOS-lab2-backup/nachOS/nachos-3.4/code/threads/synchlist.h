@@ -15,6 +15,7 @@
 #include "list.h"
 #include "synch.h"
 
+
 // The following class defines a "synchronized list" -- a list for which:
 // these constraints hold:
 //	1. Threads trying to remove an item from a list will
