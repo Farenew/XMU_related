@@ -67,8 +67,8 @@ Semaphore::P()
     IntStatus oldLevel = interrupt->SetLevel(IntOff);	// disable interrupts
     
     while (value == 0) { 			// semaphore not available
-    	queue->Append((void *)currentThread);	// so go to sleep
-    	currentThread->Sleep();
+	queue->Append((void *)currentThread);	// so go to sleep
+	currentThread->Sleep();
     } 
     value--; 					// semaphore available, 
 						// consume its value
@@ -92,7 +92,7 @@ Semaphore::V()
 
     thread = (Thread *)queue->Remove();
     if (thread != NULL)	   // make thread ready, consuming the V immediately
-	   scheduler->ReadyToRun(thread);
+	scheduler->ReadyToRun(thread);
     value++;
     (void) interrupt->SetLevel(oldLevel);
 }
@@ -101,26 +101,51 @@ Semaphore::V()
 // Note -- without a correct implementation of Condition::Wait(), 
 // the test case in the network assignment won't work!
 
-// this is version 2 for lock and condition
+// this is version 1 for lock and condition
 
 Lock::Lock(char* debugName) {
-    value = 1;              // semaphore for lock, initialize with 1
-    sp = new Semaphore(debugName, value);
-    thread = NULL;
     name = debugName;
+    value = Free;
+    waitQueue = new List;
+    thread = NULL;
 }
 Lock::~Lock() {
-    delete sp;
+    delete waitQueue;
 }
 
 void Lock::Acquire() {
-    sp->P();
-    thread = currentThread;
-}
+    IntStatus oldLevel = interrupt->SetLevel(IntOff);   // disable interrupts
+    if(value == Busy){
+        // using this to indicate lock acquire failed, thread is put into waiting list
+        currentThread->Print();
+        printf("lock acquire failed\n");
 
+        waitQueue->Append((void *)currentThread);   // append to waiting list and go sleep
+        currentThread->Sleep();
+    }
+    else{
+        value = Busy;
+        thread = currentThread;             // thread tells who owns lock now
+    }
+    (void) interrupt->SetLevel(oldLevel);   // re-enable interrupts
+}
 void Lock::Release() {
-    sp->V();
-    thread = NULL;
+    IntStatus oldLevel = interrupt->SetLevel(IntOff);   // disable interrupts
+    if(!waitQueue->IsEmpty()){
+        Thread* threadtoRun = (Thread*)waitQueue->Remove();
+        scheduler->ReadyToRun(threadtoRun);
+
+        // using this to indicate giving lock to another thread
+        currentThread->Print();
+        printf("released lock. ");
+        threadtoRun->Print();
+        printf("is ready to acquire lock\n");
+    }
+    else{
+        value = Free;
+        thread = NULL;
+    }
+    (void) interrupt->SetLevel(oldLevel);   // re-enable interrupts
 }
 bool Lock::isHeldByCurrentThread(){
     return thread == currentThread;
@@ -128,30 +153,38 @@ bool Lock::isHeldByCurrentThread(){
 
 
 Condition::Condition(char* debugName) {
-    value = 0;          // semaphore for condition, initialize with 0
-    sp = new Semaphore(debugName, value);
     name = debugName;
     waitNum = 0;
+    waitQueue = new List;
 }
 Condition::~Condition() { 
-    delete sp;
+    delete waitQueue;
 }
 void Condition::Wait(Lock* conditionLock) { 
     waitNum++;
+    waitQueue->Append((void *)currentThread);   // so go to sleep
     conditionLock->Release();
-    sp->P();
+
+    IntStatus oldLevel = interrupt->SetLevel(IntOff);   // disable interrupts
+    currentThread->Sleep();             // if we want to make thread sleep, we have to disable ints
+    (void) interrupt->SetLevel(oldLevel);   // re-enable interrupts
+
     conditionLock->Acquire();
 }
 void Condition::Signal(Lock* conditionLock) {
     if(waitNum > 0){
         waitNum--;
-        sp->V();
+        Thread* threadtoRun = (Thread*)waitQueue->Remove();
+
         printf("signal next thread to run\n");
+
+        scheduler->ReadyToRun(threadtoRun);
     }
 }
 void Condition::Broadcast(Lock* conditionLock) { 
     while(waitNum > 0){
         waitNum--;
-        sp->V();
+        Thread* threadtoRun = (Thread*)waitQueue->Remove();
+        scheduler->ReadyToRun(threadtoRun);
     }
 }

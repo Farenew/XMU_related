@@ -82,9 +82,9 @@ class Lock {
 					// Condition variable ops below.
 
   private:
-    char* name;
-    Semaphore* sp;
+    char* name;				// for debugging
     int value;
+    List *waitQueue;
     Thread *thread;         // thread indicated the current thread who has lock
     // plus some other stuff you'll need to define
 };
@@ -138,11 +138,9 @@ class Condition {
 					// these operations
 
   private:
-    Semaphore* sp;
     char* name;
     int waitNum;
-    int value;
-    
+    List *waitQueue;
     // plus some other stuff you'll need to define
 };
 #endif // SYNCH_H

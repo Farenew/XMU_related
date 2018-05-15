@@ -101,7 +101,7 @@ Semaphore::V()
 // Note -- without a correct implementation of Condition::Wait(), 
 // the test case in the network assignment won't work!
 
-// this is version 2 for lock and condition
+// this is version 1 for lock and condition
 
 Lock::Lock(char* debugName) {
     value = 1;              // semaphore for lock, initialize with 1
