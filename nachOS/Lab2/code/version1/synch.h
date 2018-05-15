@@ -89,6 +89,7 @@ class Lock {
     // plus some other stuff you'll need to define
 };
 
+
 // The following class defines a "condition variable".  A condition
 // variable does not have a value, but threads may be queued, waiting
 // on the variable.  These are only operations on a condition variable: 

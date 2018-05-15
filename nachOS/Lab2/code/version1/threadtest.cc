@@ -15,23 +15,13 @@
 #include "syndllist.h"
 
 // testnum is set in main.cc
-int testnum = 3;
+int testnum = 4;
 
 // dl is doubly linked list, N is items we store in dl
 DLList dl;
 const int N = 8;
 // sl is synchronized doubly linked list, used for threadtest 3
 Syndllist sl;
-
-//----------------------------------------------------------------------
-// SimpleThread
-// 	Loop 5 times, yielding the CPU to another ready thread 
-//	each iteration.
-//
-//	"which" is simply a number identifying the thread, for debugging
-//	purposes.
-//----------------------------------------------------------------------
-
 void
 SimpleThread(int which)
 {
@@ -56,13 +46,9 @@ void threadDelTest(int t){
 }
 
 
-void SynThreadTest(int t){
+void SynThreadBatchAdd(int t){
     int key[N] = {7,9,6,5,8,4,13,56};
-/*    srand(time(NULL));
-    for(int i=0;i<N;i++){
-        key[i] = rand()%100;
-    }
-*/
+
     // print out the keys inserted
     for(int i=0;i<N;i++){
         printf("%d\n",key[i]);
@@ -74,18 +60,41 @@ void SynThreadTest(int t){
     }
 }
 
-void SynThreadDel(int t){
+
+void SynThreadTestDel(int t){
     int keyValue;
     for(int i=0;i<N/2;i++){
         printf("\n\n--------enter thread %d for remove test--------------\n",t);
         sl.Remove(&keyValue);
         printf("thread %d remove at %d\n", t, keyValue);
         printf("--------thread %d switched for another to use------------\n\n",t);
-        currentThread->Yield();
-        
+        currentThread->Yield(); 
     }
 }
 
+void SynThreadInsert(int t){
+    const int N = 3;
+    int keyValue[N] = {3,5,8};
+    for(int i=0;i<N;i++){
+        printf("\n\n--------enter thread %d for insert test--------------\n",t);
+        int *item = &keyValue[i];
+        sl.Append((void*)item, keyValue[i]);
+        printf("list finsihed append %d with thread %d\n\n", keyValue[i], t);
+        currentThread->Yield();
+    }
+}
+
+
+void SynThreadDel(int t){
+    const int N = 3;
+    int keyValue;
+    for(int i=0;i<N;i++){
+        printf("\n\n--------enter thread %d for remove test--------------\n",t);
+        sl.Remove(&keyValue);
+        printf("thread %d remove at %d\n", t, keyValue);
+        currentThread->Yield(); 
+    }
+}
 //----------------------------------------------------------------------
 // ThreadTest1
 // 	Set up a ping-pong between two threads, by forking a thread 
@@ -131,11 +140,25 @@ void ThreadTest3(){
 
     printf("\n---------------------------\n");
 
-    SynThreadTest(0);
+    SynThreadBatchAdd(0);
     // fork a new thread to do threadDelTest, allocate thread number as 0
-    t->Fork(SynThreadDel, 0);
+    t->Fork(SynThreadTestDel, 0);
     // do threadDelTest, allocate thread number as 1
-    SynThreadDel(1);
+    SynThreadTestDel(1);
+
+}
+
+// threadtest 4, used to test condition variables.
+void ThreadTest4(){
+    DEBUG('t', "Entering ThreadTest4");
+    Thread *t = new Thread("thread to insert");
+    printf("start with del\n");
+
+    int key = 5;
+    int *item = &key;
+    t->Fork(SynThreadInsert, 1);
+
+    SynThreadDel(0);
 
 }
 //----------------------------------------------------------------------
@@ -155,6 +178,8 @@ ThreadTest()
     break;
     case 3:
     ThreadTest3();
+    case 4:
+    ThreadTest4();
 
     default:
 	printf("No test specified.\n");

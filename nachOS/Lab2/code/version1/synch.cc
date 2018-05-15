@@ -100,6 +100,9 @@ Semaphore::V()
 // Dummy functions -- so we can compile our later assignments 
 // Note -- without a correct implementation of Condition::Wait(), 
 // the test case in the network assignment won't work!
+
+// this is version 1 for lock and condition
+
 Lock::Lock(char* debugName) {
     name = debugName;
     value = Free;
@@ -109,6 +112,7 @@ Lock::Lock(char* debugName) {
 Lock::~Lock() {
     delete waitQueue;
 }
+
 void Lock::Acquire() {
     IntStatus oldLevel = interrupt->SetLevel(IntOff);   // disable interrupts
     if(value == Busy){
@@ -157,26 +161,27 @@ Condition::~Condition() {
     delete waitQueue;
 }
 void Condition::Wait(Lock* conditionLock) { 
-    // only if we have the condition, can we implemtn wait
-    ASSERT(conditionLock->isHeldByCurrentThread());         
     waitNum++;
     waitQueue->Append((void *)currentThread);   // so go to sleep
     conditionLock->Release();
-    currentThread->Sleep();
+
+    IntStatus oldLevel = interrupt->SetLevel(IntOff);   // disable interrupts
+    currentThread->Sleep();             // if we want to make thread sleep, we have to disable ints
+    (void) interrupt->SetLevel(oldLevel);   // re-enable interrupts
+
     conditionLock->Acquire();
 }
 void Condition::Signal(Lock* conditionLock) {
-    // only if we have the condition, can we implemtn signal
-    ASSERT(conditionLock->isHeldByCurrentThread());
     if(waitNum > 0){
         waitNum--;
         Thread* threadtoRun = (Thread*)waitQueue->Remove();
+
+        printf("signal next thread to run\n");
+
         scheduler->ReadyToRun(threadtoRun);
     }
 }
 void Condition::Broadcast(Lock* conditionLock) { 
-    // only if we have the condition, can we implemtn broadcast
-    ASSERT(conditionLock->isHeldByCurrentThread());
     while(waitNum > 0){
         waitNum--;
         Thread* threadtoRun = (Thread*)waitQueue->Remove();
