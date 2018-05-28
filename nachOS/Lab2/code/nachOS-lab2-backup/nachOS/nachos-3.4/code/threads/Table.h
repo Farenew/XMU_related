@@ -25,13 +25,20 @@ operating system tables of processes, threads, memory page frames, open
 files, etc.
 
 */
+#ifndef TABLE_H
+#define TABLE_H
+
+#include "utility.h"
+#include "synch.h"
 
 
 class Table {
    public:
      // create a table to hold at most 'size' entries.
-     Table(size);
+     Table(int size);
    
+	~Table();
+	
      // allocate a table slot for 'object'.
      // return the table index for the slot or -1 on error.
      int Alloc(void *object);
@@ -44,6 +51,11 @@ class Table {
      // free a table slot
      void Release(int index);
    private:
+		void **tb;	// tb is pointer to void*
+		int *idx;	// idx used to store index, indicate state for tb[i]
+		int sz;		// sz is size, used to store the size for tb and idx
+		Lock *lock;	
      // Your code here.
 };
 
+#endif // TABLE_H
