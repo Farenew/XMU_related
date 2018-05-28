@@ -48,7 +48,6 @@ THREAD_H =../threads/copyright.h\
 	../threads/utility.h\
 	../threads/dllist.h\
 	../threads/Table.h\
-	../threads/BoundBuffer.h\
 	../machine/interrupt.h\
 	../machine/sysdep.h\
 	../machine/stats.h\
@@ -67,7 +66,6 @@ THREAD_C =../threads/main.cc\
 	../threads/dllist-driver.cpp\
 	../threads/syndllist.cpp\
 	../threads/Table.cc\
-	../threads/BoundBuffer.h\
 	../machine/interrupt.cc\
 	../machine/sysdep.cc\
 	../machine/stats.cc\

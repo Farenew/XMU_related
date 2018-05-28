@@ -561,3 +561,46 @@ thread 0 remove at 3
 ##### 总结
 
 这个版本的代码打包放在version1中，包含了`threadtest.cc`,`synch.cc`,`synch.h`,`syndllist.h`,`syndllist.cpp`,以及修改过的`Makefile`
+
+---
+
+#### 1.2 版本二实现
+
+类似版本一，但使用了`Semaphore`的操作来实现，和version1类似，在`threadtest`里进行了测试。
+
+由于主要内容没有大的变化，仅仅改变了`Lock`和`Condition`的实现方式。这里就不做详细的介绍了。
+
+
+### 2. 实现一个线程安全的表结构
+
+修改过的代码放在了`\Lab2\code\table`目录下，table的实现并不复杂，使用一个`void**`来作为table entry存储`void*`，使用一个int数组来存储每个位置的状态，结构简单，操作迅速。
+
+其中在Alloc函数里用到了锁的操作，防止两个线程同时分配的时候做写入
+```c++
+int Table::Alloc(void *object)
+{
+	for(int i=0;i<sz;i++){	// do a simple loop, find first empty slot
+		lock->Acquire();
+		if(idx[i] == 0){
+			tb[i] = object;
+			idx[i] = 1;
+			lock->Release();
+			return i;
+		}
+		lock->Release();
+	}
+	return -1;		// if there is no empty slot, return -1
+}
+```
+
+这里对于空slot的寻找使用了最简单的顺序调度思想，如果需要优化SSD的随机读写， 还可以进一步扩展使用随机寻找。
+
+其它代码都较为简单，这里就不再叙述了，可以直接阅读代码及注释。
+
+### 3. 实现一个大小受限的缓冲区
+
+这个内容极为Reader-Writer问题的求解。
+
+这里采用了一个锁加两个条件变量来实现, 并使用了四个变量ar, wr, aw, ww来表示四种不同的人。使用此前实现的`Table`结构来存储内容。
+
+内容与课堂的内容类似, 没有什么创新的内容, 不做过多的介绍了。
