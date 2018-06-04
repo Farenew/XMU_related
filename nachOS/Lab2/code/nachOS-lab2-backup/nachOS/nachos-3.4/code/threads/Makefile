@@ -260,6 +260,8 @@ Table.o: ../threads/Table.cc /usr/include/stdc-predef.h \
  ../threads/stdarg.h /usr/include/bits/stdio_lim.h \
  /usr/include/bits/sys_errlist.h /usr/include/string.h \
  /usr/include/xlocale.h
+BoundBuffer.o: ../threads/BoundBuffer.cc /usr/include/stdc-predef.h \
+ ../threads/Table.h ../threads/synch.h ../threads/utility.h
 interrupt.o: ../machine/interrupt.cc /usr/include/stdc-predef.h \
  ../threads/copyright.h ../machine/interrupt.h ../threads/list.h \
  ../threads/copyright.h ../threads/utility.h ../threads/bool.h \
