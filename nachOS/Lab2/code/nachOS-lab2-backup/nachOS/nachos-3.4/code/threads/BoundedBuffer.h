@@ -21,6 +21,7 @@ class BoundedBuffer {
      // ('size' may be greater than 'maxsize')
      void Write(void *data, int size);
    private:
+<<<<<<< HEAD
 		// tb used to store data
 		Table *tb;
 		// sz is current size
@@ -29,6 +30,10 @@ class BoundedBuffer {
 		// wr stands for waiting reader
 		// aw stands for active writer
 		// ww stands for waiting writer
+=======
+		Table *tb;
+		int sz;
+>>>>>>> 8d24c127cd6fa24f945ea2086fb4b1499c80c11b
 		int ar, wr, aw, ww;
 		Lock *lock;
 		Condition *OktoWrite;
