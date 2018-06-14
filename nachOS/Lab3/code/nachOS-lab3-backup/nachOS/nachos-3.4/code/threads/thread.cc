@@ -220,7 +220,7 @@ Thread::Sleep ()
 
     status = BLOCKED;
     while ((nextThread = scheduler->FindNextToRun()) == NULL)
-	interrupt->Idle();	// no one to run, wait for an interrupt
+	   interrupt->Idle();	// no one to run, wait for an interrupt
         
     scheduler->Run(nextThread); // returns when we've been signalled
 }

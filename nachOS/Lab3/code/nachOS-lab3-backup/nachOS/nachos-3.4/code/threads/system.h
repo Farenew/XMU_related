@@ -22,6 +22,10 @@ extern void Initialize(int argc, char **argv); 	// Initialization,
 extern void Cleanup();				// Cleanup, called when
 						// Nachos is done.
 
+// inplementing Wake here rather than alarm.h because 
+// we want to use variable interrupt, which is created in system.cc
+//void Wake(int dummy);
+
 extern Thread *currentThread;			// the thread holding the CPU
 extern Thread *threadToBeDestroyed;  		// the thread that just finished
 extern Scheduler *scheduler;			// the ready list

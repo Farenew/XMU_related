@@ -7,6 +7,7 @@
 
 #include "copyright.h"
 #include "system.h"
+#include "alarm.h"
 
 // This defines *all* of the global data structures used by Nachos.
 // These are all initialized and de-allocated by this file.
@@ -18,6 +19,7 @@ Interrupt *interrupt;			// interrupt status
 Statistics *stats;			// performance metrics
 Timer *timer;				// the hardware timer device,
 					// for invoking context switches
+Alarm *alarm;
 
 #ifdef FILESYS_NEEDED
 FileSystem  *fileSystem;
@@ -62,6 +64,8 @@ TimerInterruptHandler(int dummy)
 {
     if (interrupt->getStatus() != IdleMode)
 	interrupt->YieldOnReturn();
+
+	printf("\n--------system time tick---------\n");
 }
 
 //----------------------------------------------------------------------
@@ -133,8 +137,17 @@ Initialize(int argc, char **argv)
     stats = new Statistics();			// collect statistics
     interrupt = new Interrupt;			// start up interrupt handling
     scheduler = new Scheduler();		// initialize the ready queue
-    if (randomYield)				// start the timer (if needed)
-	timer = new Timer(TimerInterruptHandler, 0, randomYield);
+	
+	// comment this if condition out, so that our timer would always be enabled
+    // if (randomYield)				// start the timer (if needed)
+	
+    // here we also commentted out timer, since we cannot have to timer at same time!!!!
+	//timer = new Timer(TimerInterruptHandler, 0, randomYield);
+
+
+    // since we cannot have two timer at the same time, so we use alarm here!!!
+    alarm = new Alarm();
+
 
     threadToBeDestroyed = NULL;
 

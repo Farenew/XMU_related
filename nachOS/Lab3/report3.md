@@ -214,3 +214,13 @@ current test is 2
 ```
 
 修改的代码包括`threadtest.cc`,`Makefile`, `Makefile.com`, `EventBarrier.cc`,`EventBarrier.h`
+
+### 2. 闹钟原语
+
+在实现之后, 发现一个问题：由于在`Interrupt::SetLevel()`执行的时候, 内部存在一个`Interrupt::OneTick()`的强制时间前进的调用, 而这一函数中会对中断做`CheckIfDue()`的检查, 如果没有达到执行时间, 那么会重新放回pending队列中等待。而`thread`的操作中都会做`SetLevel()`来回归context switch之前的内容!!!! 这也就是说, **如果我们在pending队列里放入一个以上的内容, 那么程序就永远不会停下去, 即便只有一个线程, 但是线程在做操作(例如sleep, yield)的时候会依次检查pending中的内容, 导致状态复原与继续**。
+
+因此, 在加入一个新的时间中断的时候, 必须把旧的关闭, 也就是说, **nachOS内部pending队列中只能同时允许一个中断存在, 否则就会因为依次检测而不为空导致nachOS永远执行下去**。
+
+因此在实现的时候, 我们要修改`system.cc`的内容, 把其中原有的Timer关掉, 换成我们的Alarm。(我们在Alarm内部使用Timer来实现)。
+
+决定两部实现, 先实现一个functor来给Timer使用, 让这个通过调用Alarm.Wake来实现进一步操作
