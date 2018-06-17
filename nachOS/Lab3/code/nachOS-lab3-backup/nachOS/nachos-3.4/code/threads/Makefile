@@ -234,6 +234,7 @@ dllist-driver.o: ../threads/dllist-driver.cpp /usr/include/stdc-predef.h \
  /usr/include/_G_config.h /usr/include/bits/stdio_lim.h \
  /usr/include/bits/sys_errlist.h /usr/include/string.h
 EventBarrier.o: ../threads/EventBarrier.cc ../threads/EventBarrier.h ../threads/synch.h
+Elevator.o: ../threads/Elevator.cc ../threads/Elevator.h ../threads/EventBarrier.h
 alarm.o: ../threads/alarm.cc ../threads/alarm.h ../machine/timer.h
 syndllist.o: ../threads/syndllist.cpp /usr/include/stdc-predef.h \
  ../threads/copyright.h ../threads/syndllist.h ../threads/dllist.h \

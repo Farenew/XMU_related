@@ -66,6 +66,7 @@ THREAD_C =../threads/main.cc\
 	../threads/utility.cc\
 	../threads/threadtest.cc\
 	../threads/dllist.cpp\
+	../threads/Elevator.cc\
 	../threads/dllist-driver.cpp\
 	../threads/EventBarrier.cc\
 	../threads/syndllist.cpp\
@@ -81,7 +82,7 @@ THREAD_S = ../threads/switch.s
 
 THREAD_O =main.o list.o scheduler.o synch.o synchlist.o system.o thread.o \
 	utility.o threadtest.o interrupt.o stats.o sysdep.o timer.o \
-	dllist.o dllist-driver.o syndllist.o Table.o EventBarrier.o alarm.o
+	dllist.o dllist-driver.o syndllist.o Table.o EventBarrier.o alarm.o Elevator.o
 
 USERPROG_H = ../userprog/addrspace.h\
 	../userprog/bitmap.h\
